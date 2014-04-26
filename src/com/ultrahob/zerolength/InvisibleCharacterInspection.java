@@ -21,10 +21,10 @@ import java.util.regex.Pattern;
  */
 public class InvisibleCharacterInspection extends LocalInspectionTool {
 
-    private final InvisibleCharacterDescriptor zeroWidthSpaceDescriptor = new InvisibleCharacterDescriptor("200B", "zero width space", "reportZeroWidthSpace");
-    private final InvisibleCharacterDescriptor zeroWidthNonJoinerDescriptor = new InvisibleCharacterDescriptor("200C", "zero width non-joiner", "reportZeroWidthNonJoiner");
-    private final InvisibleCharacterDescriptor zeroWidthJoinerDescriptor = new InvisibleCharacterDescriptor("200D", "zero width joiner", "reportZeroWidthJoiner");
-    private final InvisibleCharacterDescriptor zeroWidthNoBreakDescriptor = new InvisibleCharacterDescriptor("FEFF", "zero width no-break space", "reportZeroWidthNoBreak");
+    private final InvisibleCharacterDescriptor zeroWidthSpaceDescriptor = new InvisibleCharacterDescriptor("200B", "Zero width space", "reportZeroWidthSpace");
+    private final InvisibleCharacterDescriptor zeroWidthNonJoinerDescriptor = new InvisibleCharacterDescriptor("200C", "Zero width non-joiner", "reportZeroWidthNonJoiner");
+    private final InvisibleCharacterDescriptor zeroWidthJoinerDescriptor = new InvisibleCharacterDescriptor("200D", "Zero width joiner", "reportZeroWidthJoiner");
+    private final InvisibleCharacterDescriptor zeroWidthNoBreakDescriptor = new InvisibleCharacterDescriptor("FEFF", "Zero width no-break space", "reportZeroWidthNoBreak");
 
     public boolean reportZeroWidthSpace = true;
     public boolean reportZeroWidthNonJoiner = true;
@@ -35,16 +35,11 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
         return Arrays.asList(zeroWidthSpaceDescriptor, zeroWidthNonJoinerDescriptor, zeroWidthJoinerDescriptor, zeroWidthNoBreakDescriptor);
     }
 
-    @Override
-    public boolean isEnabledByDefault() {
-        return true;
-    }
-
     @Nls
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Invisible Unicode Character";
+        return "Zero Width Unicode Character";
     }
 
     @Override
@@ -75,13 +70,24 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
 
                     PsiElement badElement = file.findElementAt(indexOf);
                     if (badElement != null) {
-                        problems.add(manager.createProblemDescriptor(badElement, "Suspicious character: "+ descriptor.getForbiddenCharacter(),
+                        String replacementText = buildReplacementText(descriptor, badElement);
+                        problems.add(manager.createProblemDescriptor(badElement, descriptor.description + " character found, resulting in: " + replacementText,
                                 (LocalQuickFix) null, ProblemHighlightType.GENERIC_ERROR, isOnTheFly));
                     }
                 }
             }
         }
         return problems == null ? null : problems.toArray(new ProblemDescriptor[problems.size()]);
+    }
+
+    private String buildReplacementText(InvisibleCharacterDescriptor descriptor, PsiElement badElement) {
+        StringBuffer sb = new StringBuffer();
+        Matcher m = descriptor.getPattern().matcher(badElement.getText());
+        while (m.find()) {
+            m.appendReplacement(sb, "\\u" + descriptor.getForbiddenCharacter());
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 
     @Nullable

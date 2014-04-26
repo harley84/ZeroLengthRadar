@@ -1,31 +1,29 @@
 <idea-plugin version="2">
-    <id>com.yourcompany.unique.plugin.id</id>
-    <name>Plugin display name here</name>
-    <version>1.0</version>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <id>com.ultrahob.zerolength.plugin</id>
+    <name>Zero Width Characters locator</name>
+    <version>0.9</version>
+    <vendor url="https://github.com/harley84/ZeroLengthRadar">Victor Rosenberg</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Inspired by <a href="http://stackoverflow.com/q/9868796/579828">this question</a> on Stack Overflow - this plugin adds an inspection that prevents
+        some hard to find bugs related to invisible zero width characters in source code and resources.
     ]]></description>
 
     <change-notes><![CDATA[
-        Add change notes here.<br>
-        <em>most HTML tags may be used</em>
+        Version 0.9 - First public release
         ]]>
   </change-notes>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="131"/>
+    <idea-version since-build="129"/>
 
     <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
-    -->
 
     <extensions defaultExtensionNs="com.intellij">
         <localInspection
+                enabledByDefault="true"
                 implementationClass="com.ultrahob.zerolength.InvisibleCharacterInspection"/>
     </extensions>
 
