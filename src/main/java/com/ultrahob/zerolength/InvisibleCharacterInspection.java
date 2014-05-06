@@ -87,7 +87,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
             m.appendReplacement(sb, "\\u" + descriptor.getForbiddenCharacter());
         }
         m.appendTail(sb);
-        return sb.toString();
+//        return "lalala";//sb.toString().trim();
+        return sb.toString().trim().replace("\"", "\\\"");
     }
 
     @Nullable
