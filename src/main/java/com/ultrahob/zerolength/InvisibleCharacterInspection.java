@@ -20,19 +20,21 @@ import java.util.regex.Pattern;
  * @author Victor Rosenberg, 17.04.2014 18:10
  */
 public class InvisibleCharacterInspection extends LocalInspectionTool {
-
     private final InvisibleCharacterDescriptor zeroWidthSpaceDescriptor = new InvisibleCharacterDescriptor("200B", "Zero width space", "reportZeroWidthSpace");
     private final InvisibleCharacterDescriptor zeroWidthNonJoinerDescriptor = new InvisibleCharacterDescriptor("200C", "Zero width non-joiner", "reportZeroWidthNonJoiner");
     private final InvisibleCharacterDescriptor zeroWidthJoinerDescriptor = new InvisibleCharacterDescriptor("200D", "Zero width joiner", "reportZeroWidthJoiner");
     private final InvisibleCharacterDescriptor zeroWidthNoBreakDescriptor = new InvisibleCharacterDescriptor("FEFF", "Zero width no-break space", "reportZeroWidthNoBreak");
-
+    private final InvisibleCharacterDescriptor endOfTextDescriptor = new InvisibleCharacterDescriptor("0003", "End of Text character", "reportEndOfText");
     public boolean reportZeroWidthSpace = true;
     public boolean reportZeroWidthNonJoiner = true;
     public boolean reportZeroWidthJoiner = true;
     public boolean reportZeroWidthNoBreak = true;
+    public boolean reportEndOfText = true;
 
     private List<InvisibleCharacterDescriptor> getDescriptors() {
-        return Arrays.asList(zeroWidthSpaceDescriptor, zeroWidthNonJoinerDescriptor, zeroWidthJoinerDescriptor, zeroWidthNoBreakDescriptor);
+        return Arrays.asList(zeroWidthSpaceDescriptor, zeroWidthNonJoinerDescriptor,
+                zeroWidthJoinerDescriptor, zeroWidthNoBreakDescriptor,
+                endOfTextDescriptor);
     }
 
     @Nls
@@ -145,6 +147,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 return InvisibleCharacterInspection.this.reportZeroWidthSpace;
             } else if ("reportZeroWidthNoBreak".equals(propertyName)) {
                 return InvisibleCharacterInspection.this.reportZeroWidthNoBreak;
+            } else if ("reportEndOfText".equals(propertyName)) {
+                return InvisibleCharacterInspection.this.reportEndOfText;
             } else {
                 return false;
             }
