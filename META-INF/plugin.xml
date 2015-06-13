@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ultrahob.zerolength.plugin</id>
     <name>Zero Width Characters locator</name>
-    <version>0.9</version>
+    <version>0.91</version>
     <vendor url="https://github.com/harley84/ZeroLengthRadar">Victor Rosenberg</vendor>
 
     <description><![CDATA[
@@ -10,7 +10,7 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Version 0.9 - First public release
+        Version 0.91 - Adding detection for more invisible characters
         ]]>
   </change-notes>
 
