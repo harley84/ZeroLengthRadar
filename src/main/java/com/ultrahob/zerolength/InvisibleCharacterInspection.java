@@ -25,16 +25,18 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
     private final InvisibleCharacterDescriptor zeroWidthJoinerDescriptor = new InvisibleCharacterDescriptor("200D", "Zero width joiner", "reportZeroWidthJoiner");
     private final InvisibleCharacterDescriptor zeroWidthNoBreakDescriptor = new InvisibleCharacterDescriptor("FEFF", "Zero width no-break space", "reportZeroWidthNoBreak");
     private final InvisibleCharacterDescriptor endOfTextDescriptor = new InvisibleCharacterDescriptor("0003", "End of Text character", "reportEndOfText");
+    private final InvisibleCharacterDescriptor noBreakSpaceDescriptor = new InvisibleCharacterDescriptor("00A0", "No-Break space character", "reportNoBreakSpace");
     public boolean reportZeroWidthSpace = true;
     public boolean reportZeroWidthNonJoiner = true;
     public boolean reportZeroWidthJoiner = true;
     public boolean reportZeroWidthNoBreak = true;
     public boolean reportEndOfText = true;
+    public boolean reportNoBreakSpace = true;
 
     private List<InvisibleCharacterDescriptor> getDescriptors() {
         return Arrays.asList(zeroWidthSpaceDescriptor, zeroWidthNonJoinerDescriptor,
                 zeroWidthJoinerDescriptor, zeroWidthNoBreakDescriptor,
-                endOfTextDescriptor);
+                endOfTextDescriptor, noBreakSpaceDescriptor);
     }
 
     @Nls
@@ -149,6 +151,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 return InvisibleCharacterInspection.this.reportZeroWidthNoBreak;
             } else if ("reportEndOfText".equals(propertyName)) {
                 return InvisibleCharacterInspection.this.reportEndOfText;
+            } else if ("reportNoBreakSpace".equals(propertyName)) {
+                return InvisibleCharacterInspection.this.reportNoBreakSpace;
             } else {
                 return false;
             }
