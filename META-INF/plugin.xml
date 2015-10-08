@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.ultrahob.zerolength.plugin</id>
     <name>Zero Width Characters locator</name>
-    <version>0.91</version>
+    <version>0.92</version>
     <vendor url="https://github.com/harley84/ZeroLengthRadar">Victor Rosenberg</vendor>
 
     <description><![CDATA[
@@ -10,7 +10,14 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        Version 0.91 - Adding detection for more invisible characters
+        <ul><h3><b>0.92 - Adding detection for more invisible characters and quick fix.</b></h3>
+          <li>Add \u200E left to right mark and \u200F right to left mark characters.</li>
+          <li>Change combine all found characters into one tooltip per element.</li>
+          <li>Add file scope warning per found character.</li>
+          <li>Add Quick fix to remove invisible characters per element for all characters and for the file for all and per character.</li>
+        </ul>
+        <ul><h3><b>0.91 - Adding detection for more invisible characters.</b></h3>
+        </ul>
         ]]>
   </change-notes>
 
