@@ -27,6 +27,7 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
     private final InvisibleCharacterDescriptor zeroWidthNoBreakDescriptor = new InvisibleCharacterDescriptor("FEFF", "", "Zero width no-break space", "reportZeroWidthNoBreak");
     private final InvisibleCharacterDescriptor endOfTextDescriptor = new InvisibleCharacterDescriptor("0003", "", "End of Text character", "reportEndOfText");
     private final InvisibleCharacterDescriptor noBreakSpaceDescriptor = new InvisibleCharacterDescriptor("00A0", " ", "No-Break space character", "reportNoBreakSpace");
+    private final InvisibleCharacterDescriptor lineSeparator = new InvisibleCharacterDescriptor("2028", "", "Line separator", "reportLineSeparator");
 
     public boolean reportZeroWidthSpace = true;
     public boolean reportZeroWidthNonJoiner = true;
@@ -36,6 +37,7 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
     public boolean reportZeroWidthNoBreak = true;
     public boolean reportEndOfText = true;
     public boolean reportNoBreakSpace = true;
+    public boolean reportLineSeparator = true;
 
     private List<InvisibleCharacterDescriptor> getDescriptors() {
         return Arrays.asList(
@@ -46,7 +48,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 leftToRightMarkDescriptor,
                 rightToLeftMarkDescriptor,
                 endOfTextDescriptor,
-                noBreakSpaceDescriptor
+                noBreakSpaceDescriptor,
+                lineSeparator
         );
     }
 
@@ -222,6 +225,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 return InvisibleCharacterInspection.this.reportRightToLeftMark;
             } else if ("reportNoBreakSpace".equals(propertyName)) {
                 return InvisibleCharacterInspection.this.reportNoBreakSpace;
+            } else if ("reportLineSeparator".equals(propertyName)) {
+                return InvisibleCharacterInspection.this.reportLineSeparator;
             } else {
                 // vsch: should really assert fail here because we forgot to add a case
                 return false;
