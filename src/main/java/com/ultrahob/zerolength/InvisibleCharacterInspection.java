@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Victor Rosenberg, 17.04.2014 18:10
@@ -77,7 +78,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
         List<ProblemDescriptor> problems = null;
         HashMap<PsiElement, HashSet<InvisibleCharacterDescriptor>> badElements = null;
 
-        // vsch: accumulate characters per element and produce a single inspection for all found characters. Otherwise creates huge tooltips one for every occurence and every character
+        // vsch: accumulate characters per element and produce a single inspection for all found characters.
+        // Otherwise creates huge tooltips one for every occurrence and every character
         for (InvisibleCharacterDescriptor descriptor : getDescriptors()) {
             if (descriptor.isEnabled()) {
                 Matcher matcher = descriptor.getPattern().matcher(file.getText());
@@ -85,73 +87,60 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                     PsiElement badElement = file.findElementAt(matcher.start());
                     if (badElement != null) {
                         if (badElements == null) {
-                            badElements = new HashMap<PsiElement, HashSet<InvisibleCharacterDescriptor>>();
+                            badElements = new HashMap<>();
                         }
 
                         // add whole file so we can fix it
                         if (!badElements.containsKey(file)) {
-                            badElements.put(file, new HashSet<InvisibleCharacterDescriptor>(1));
+                            badElements.put(file, new HashSet<>(1));
                         }
                         badElements.get(file).add(descriptor);
 
                         if (!badElements.containsKey(badElement)) {
-                            badElements.put(badElement, new HashSet<InvisibleCharacterDescriptor>(1));
-                        } else {
-                            if (badElements.get(badElement).contains(descriptor)) continue;
+                            badElements.put(badElement, new HashSet<>(1));
+                        } else if (!badElements.get(badElement).contains(descriptor)) {
+                            badElements.get(badElement).add(descriptor);
                         }
-
-                        badElements.get(badElement).add(descriptor);
                     }
                 }
             }
         }
 
         if (badElements != null && badElements.size() > 0) {
-            problems = new ArrayList<ProblemDescriptor>();
-            for (PsiElement badElement : badElements.keySet()) {
-                String description = "";
-                for (InvisibleCharacterDescriptor descriptor : badElements.get(badElement)) {
-                    if (!description.isEmpty()) description += ", ";
-                    description += descriptor.description;
-                }
+            problems = new ArrayList<>();
 
-                InvisibleCharacterLocalQuickFix quickFix = new InvisibleCharacterLocalQuickFix(badElement, badElements.get(badElement));
+            for (Map.Entry<PsiElement, HashSet<InvisibleCharacterDescriptor>> psiElementHashSetEntry : badElements.entrySet()) {
 
-                if (badElement instanceof PsiFile) {
-                    problems.add(manager.createProblemDescriptor(badElement, "1. " + description + "(s) found in file",
-                            (LocalQuickFix) quickFix, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly));
+                String description = psiElementHashSetEntry.getValue().stream()
+                        .map(InvisibleCharacterDescriptor::getDescription)
+                        .collect(Collectors.joining(", "));
 
-                    if (badElements.get(badElement).size() > 1) {
+                InvisibleCharacterLocalQuickFix quickFix = new InvisibleCharacterLocalQuickFix(psiElementHashSetEntry.getKey(), psiElementHashSetEntry.getValue());
+
+                if (psiElementHashSetEntry.getKey() instanceof PsiFile) {
+                    problems.add(manager.createProblemDescriptor(psiElementHashSetEntry.getKey(), "1. " + description + "(s) found in file",
+                            quickFix, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly));
+
+                    if (psiElementHashSetEntry.getValue().size() > 1) {
                         // add one per descriptor to file fixes
                         int index = 2;
-                        for (InvisibleCharacterDescriptor descriptor : badElements.get(badElement)) {
-                            ArrayList<InvisibleCharacterDescriptor> singleDescriptor = new ArrayList<InvisibleCharacterDescriptor>(1);
+                        for (InvisibleCharacterDescriptor descriptor : psiElementHashSetEntry.getValue()) {
+                            ArrayList<InvisibleCharacterDescriptor> singleDescriptor = new ArrayList<>(1);
                             singleDescriptor.add(descriptor);
 
-                            quickFix = new InvisibleCharacterLocalQuickFix(badElement, singleDescriptor);
-                            problems.add(manager.createProblemDescriptor(badElement, (index++) + ". " + descriptor.description + "(s) found in file",
-                                    (LocalQuickFix) quickFix, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly));
+                            quickFix = new InvisibleCharacterLocalQuickFix(psiElementHashSetEntry.getKey(), singleDescriptor);
+                            problems.add(manager.createProblemDescriptor(psiElementHashSetEntry.getKey(), (index++) + ". " + descriptor.description + "(s) found in file",
+                                    quickFix, ProblemHighlightType.GENERIC_ERROR_OR_WARNING, isOnTheFly));
                         }
                     }
                 } else {
-                    String replacementText = quickFix.uncleanText(badElement.getText());
-                    problems.add(manager.createProblemDescriptor(badElement, description + "(s) found, resulting in: " + replacementText,
-                            (LocalQuickFix) quickFix, ProblemHighlightType.GENERIC_ERROR, isOnTheFly));
+                    String replacementText = quickFix.uncleanText(psiElementHashSetEntry.getKey().getText());
+                    problems.add(manager.createProblemDescriptor(psiElementHashSetEntry.getKey(), description + "(s) found, resulting in: " + replacementText,
+                            quickFix, ProblemHighlightType.GENERIC_ERROR, isOnTheFly));
                 }
             }
         }
         return problems == null ? null : problems.toArray(new ProblemDescriptor[problems.size()]);
-    }
-
-    private String buildReplacementText(InvisibleCharacterDescriptor descriptor, PsiElement badElement) {
-        StringBuffer sb = new StringBuffer();
-        Matcher m = descriptor.getPattern().matcher(badElement.getText());
-        while (m.find()) {
-            m.appendReplacement(sb, "\\u" + descriptor.getForbiddenCharacter());
-        }
-        m.appendTail(sb);
-        //        return "lalala";//sb.toString().trim();
-        return sb.toString().trim().replace("\"", "\\\"");
     }
 
     @Nullable
@@ -231,11 +220,6 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 // vsch: should really assert fail here because we forgot to add a case
                 return false;
             }
-            //            try {
-            //                return InvisibleCharacterInspection.class.getField(getPropertyName()).getBoolean(InvisibleCharacterInspection.this);
-            //            } catch (Exception e) {
-            //                return false;
-            //            }
         }
     }
 }

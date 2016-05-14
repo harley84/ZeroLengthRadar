@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.List;
 
 public class InvisibleCharacterLocalQuickFix extends LocalQuickFixAndIntentionActionOnPsiElement {
     private final @NotNull Collection<InvisibleCharacterInspection.InvisibleCharacterDescriptor> removeDescriptors;

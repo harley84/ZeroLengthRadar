@@ -10,7 +10,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-        Version 0.93 - Adding detection for more invisible characters
+        Version 0.93 - Adding detection for line separator character (\u2028)
         ]]>
   </change-notes>
 
