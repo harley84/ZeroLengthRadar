@@ -29,6 +29,7 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
     private final InvisibleCharacterDescriptor endOfTextDescriptor = new InvisibleCharacterDescriptor("0003", "", "End of Text character", "reportEndOfText");
     private final InvisibleCharacterDescriptor noBreakSpaceDescriptor = new InvisibleCharacterDescriptor("00A0", " ", "No-Break space character", "reportNoBreakSpace");
     private final InvisibleCharacterDescriptor lineSeparator = new InvisibleCharacterDescriptor("2028", "", "Line separator", "reportLineSeparator");
+    private final InvisibleCharacterDescriptor startOfHeading = new InvisibleCharacterDescriptor("0001", "", "Start of Heading", "reportStartOfHeading");
 
     public boolean reportZeroWidthSpace = true;
     public boolean reportZeroWidthNonJoiner = true;
@@ -39,6 +40,7 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
     public boolean reportEndOfText = true;
     public boolean reportNoBreakSpace = true;
     public boolean reportLineSeparator = true;
+    public boolean startOfHeading = true;
 
     private List<InvisibleCharacterDescriptor> getDescriptors() {
         return Arrays.asList(
@@ -50,7 +52,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 rightToLeftMarkDescriptor,
                 endOfTextDescriptor,
                 noBreakSpaceDescriptor,
-                lineSeparator
+                lineSeparator,
+                startOfHeading
         );
     }
 
@@ -216,6 +219,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 return InvisibleCharacterInspection.this.reportNoBreakSpace;
             } else if ("reportLineSeparator".equals(propertyName)) {
                 return InvisibleCharacterInspection.this.reportLineSeparator;
+            }  else if ("startOfHeading".equals(propertyName)) {
+                return InvisibleCharacterInspection.this.reportstartOfHeading;
             } else {
                 // vsch: should really assert fail here because we forgot to add a case
                 return false;
