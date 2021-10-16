@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class InvisibleCharacterLocalQuickFix extends LocalQuickFixAndIntentionActionOnPsiElement {
     private final @NotNull Collection<InvisibleCharacterInspection.InvisibleCharacterDescriptor> removeDescriptors;
@@ -25,13 +26,9 @@ public class InvisibleCharacterLocalQuickFix extends LocalQuickFixAndIntentionAc
     }
 
     protected String unicodeCharacterList() {
-        String list = "";
-
-        for (InvisibleCharacterInspection.InvisibleCharacterDescriptor descriptor : removeDescriptors) {
-            if (!list.isEmpty()) list += ", ";
-            list += descriptor.getForbiddenCharacterString();
-        }
-        return uncleanText(list);
+        return uncleanText(removeDescriptors.stream()
+            .map(InvisibleCharacterInspection.InvisibleCharacterDescriptor::getForbiddenCharacterString)
+            .collect(Collectors.joining(",")));
     }
 
     protected String cleanText(@NotNull String text) {
@@ -47,7 +44,8 @@ public class InvisibleCharacterLocalQuickFix extends LocalQuickFixAndIntentionAc
         String cleanedText = text;
 
         for (InvisibleCharacterInspection.InvisibleCharacterDescriptor descriptor : removeDescriptors) {
-            cleanedText = cleanedText.replace(descriptor.getForbiddenCharacterString(), "\\u" + String.format("%04X", descriptor.getForbiddenCharacterString().codePointAt(0)));
+            cleanedText = cleanedText.replace(descriptor.getForbiddenCharacterString(),
+                "\\u" + String.format("%04X", descriptor.getForbiddenCharacterString().codePointAt(0)));
         }
         return cleanedText;
     }

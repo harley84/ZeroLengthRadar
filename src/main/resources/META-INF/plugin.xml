@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>com.ultrahob.zerolength.plugin</id>
+    <name>Zero Width Characters locator</name>
+    <vendor url="https://github.com/harley84/ZeroLengthRadar">Victor Rosenberg</vendor>
+
+    <description><![CDATA[
+
+      Inspired by <a href="https://stackoverflow.com/q/9868796/579828">this question</a> on Stack Overflow - this plugin adds an inspection that prevents
+        some hard to find bugs related to invisible zero width characters in source code and resources.
+      Usage - make sure that the "Zero width unicode character" inspection is enabled.
+    ]]></description>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
+    <idea-version since-build="212"/>
+
+    <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
+         on how to target different products -->
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection
+                displayName="Zero width unicode character"
+                groupBundle="messages.InspectionsBundle"
+                groupKey="group.names.potentially.confusing.code.constructs"
+                enabledByDefault="true"
+                implementationClass="com.ultrahob.zerolength.InvisibleCharacterInspection"/>
+    </extensions>
+
+    <application-components>
+        <!-- Add your application components here -->
+        <!--<component>-->
+        <!--<implementation-class>com.ultrahob.analyzer</implementation-class>-->
+        <!--</component>-->
+    </application-components>
+
+    <project-components>
+        <!-- Add your project components here -->
+    </project-components>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>

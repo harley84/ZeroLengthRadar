@@ -1,11 +1,12 @@
 package com.ultrahob.zerolength;
 
-import com.intellij.codeInsight.daemon.GroupNames;
-import com.intellij.codeInspection.*;
+import com.intellij.codeInspection.InspectionManager;
+import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ui.MultipleCheckboxOptionsPanel;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,19 +55,6 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
         );
     }
 
-    @Nls
-    @NotNull
-    @Override
-    public String getDisplayName() {
-        return "Zero Width Unicode Character";
-    }
-
-    @Override
-    @NotNull
-    public String getGroupDisplayName() {
-        return GroupNames.CONFUSING_GROUP_NAME;
-    }
-
     @Nullable
     @Override
     public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull InspectionManager manager, boolean isOnTheFly) {
@@ -76,7 +64,7 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
         }
 
         List<ProblemDescriptor> problems = null;
-        HashMap<PsiElement, HashSet<InvisibleCharacterDescriptor>> badElements = null;
+        Map<PsiElement, HashSet<InvisibleCharacterDescriptor>> badElements = new HashMap<>();
 
         // vsch: accumulate characters per element and produce a single inspection for all found characters.
         // Otherwise creates huge tooltips one for every occurrence and every character
@@ -86,27 +74,20 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 while (matcher.find()) {
                     PsiElement badElement = file.findElementAt(matcher.start());
                     if (badElement != null) {
-                        if (badElements == null) {
-                            badElements = new HashMap<>();
-                        }
-
                         // add whole file so we can fix it
-                        if (!badElements.containsKey(file)) {
-                            badElements.put(file, new HashSet<>(1));
-                        }
-                        badElements.get(file).add(descriptor);
+                        badElements
+                            .computeIfAbsent(file, k-> new HashSet<>(1))
+                            .add(descriptor);
 
-                        if (!badElements.containsKey(badElement)) {
-                            badElements.put(badElement, new HashSet<>(1));
-                        } else if (!badElements.get(badElement).contains(descriptor)) {
-                            badElements.get(badElement).add(descriptor);
-                        }
+                        badElements
+                            .computeIfAbsent(badElement, k-> new HashSet<>(1))
+                            .add(descriptor);
                     }
                 }
             }
         }
 
-        if (badElements != null && badElements.size() > 0) {
+        if (!badElements.isEmpty()) {
             problems = new ArrayList<>();
 
             for (Map.Entry<PsiElement, HashSet<InvisibleCharacterDescriptor>> psiElementHashSetEntry : badElements.entrySet()) {
@@ -140,7 +121,8 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
                 }
             }
         }
-        return problems == null ? null : problems.toArray(new ProblemDescriptor[problems.size()]);
+
+        return problems == null ? null : problems.toArray(new ProblemDescriptor[0]);
     }
 
     @Nullable
@@ -169,7 +151,7 @@ public class InvisibleCharacterInspection extends LocalInspectionTool {
             this.replacementCharacter = replacementCharacter;
             this.description = description;
             this.propertyName = propertyName;
-            this.pattern = Pattern.compile("\\u" + forbiddenCharacter);
+            this.pattern = Pattern.compile(String.format("\\u%s", forbiddenCharacter));
         }
 
         public String getForbiddenCharacter() {
